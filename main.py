@@ -15,20 +15,24 @@ dp = Dispatcher(bot)
 async def start(message: types.Message):
     await message.answer("Бот работает на Render ✔")
 
+
 @dp.message_handler()
 async def echo(message: types.Message):
     await message.answer(f"Ты отправил: {message.text}")
 
+
 # --- Webhook settings ---
 WEBHOOK_PATH = "/webhook"
-WEBHOOK_URL = os.getenv("RENDER_EXTERNAL_URL") + WEBHOOK_PATH
+RENDER_URL = os.getenv("RENDER_EXTERNAL_URL")
 
+WEBHOOK_URL = RENDER_URL + WEBHOOK_PATH
 WEBAPP_HOST = "0.0.0.0"
 WEBAPP_PORT = int(os.getenv("PORT", 10000))
 
 
 async def on_startup(dp):
     await bot.set_webhook(WEBHOOK_URL)
+
 
 async def on_shutdown(dp):
     await bot.delete_webhook()
