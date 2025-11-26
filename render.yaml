@@ -2,12 +2,9 @@ services:
   - type: web
     name: maya-kitchen-bot
     env: python
-    region: frankfurt
     plan: free
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
     startCommand: "python main.py"
     envVars:
       - key: BOT_TOKEN
         sync: false
-      - key: RENDER_EXTERNAL_URL
-        sync: true
