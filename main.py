@@ -1,5 +1,4 @@
 import os
-from aiohttp import web
 from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher.filters import CommandStart
 from aiogram.utils.executor import start_webhook
