@@ -1,35 +1,53 @@
 import asyncio
-import logging
-from aiogram import Bot, Dispatcher, types
-from aiogram.filters import CommandStart
+from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message
 import os
 
-# ВАЖНО: токен берём из переменных среды Render
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = os.getenv("BOT_TOKEN")
 
-# Проверка
-if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN не найден! Добавь переменную среды BOT_TOKEN в Render.")
-
-# Инициализация
-logging.basicConfig(level=logging.INFO)
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Команда /start
-@dp.message(CommandStart())
+# Приветствие
+@dp.message(F.text == "/start")
 async def start(message: Message):
-    await message.answer("Привет! Бот успешно запущен 🔥")
+    await message.answer(
+        "Здравствуйте! 👋\n"
+        "Я — бот кухни Майя.\n"
+        "Готов помочь вам с заказом, замером или консультацией.\n\n"
+        "Как вас зовут?"
+    )
 
-# Ловим остальные сообщения
+# Получаем имя
 @dp.message()
-async def echo(message: Message):
-    await message.answer(f"Ты сказал: {message.text}")
+async def get_name(message: Message):
+    user_name = message.text
+    await message.answer(
+        f"Очень приятно, {user_name}! 😊\n\n"
+        "Оставьте, пожалуйста, номер телефона, чтобы наш специалист связался с вами."
+    )
 
-# Основная функция
+    # Следующее сообщение пользователя будет обработано другой функцией
+    dp.message.register(get_phone, F.text)
+
+async def get_phone(message: Message):
+    phone = message.text
+    await message.answer(
+        f"Спасибо! 📞 Мы получили ваш номер: {phone}\n\n"
+        "Хотите записаться на бесплатный замер?"
+    )
+
+    dp.message.register(final_step, F.text)
+
+async def final_step(message: Message):
+    await message.answer(
+        "Отлично! 🎉\n"
+        "Наш менеджер свяжется с вами в ближайшее время.\n\n"
+        "Спасибо, что выбрали нас!"
+    )
+
 async def main():
-    print("Бот запущен...")
+    print("Bot started...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
